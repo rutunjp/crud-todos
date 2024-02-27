@@ -39,9 +39,13 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const { body } = request;
-    console.log(body);
-    const result = await tasksCollection.insertOne(body);
+    let body = "";
+    for await (const chunk of request.body) {
+      body += chunk;
+    }
+    const parsedBody = JSON.parse(body);
+    console.log("POST", parsedBody);
+    const result = await tasksCollection.insertOne(parsedBody);
     return NextResponse.json({ status: "success", data: result.ops[0] });
   } catch (error) {
     console.error("Error inserting data into MongoDB:", error);

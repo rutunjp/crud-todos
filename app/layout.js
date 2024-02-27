@@ -13,8 +13,10 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         {" "}
-        <h1 className="text-3xl font-bold">Todos App</h1>
-        {children}
+        <div className="w-1/2 m-auto flex flex-col items-center bg-slate-100 py-8">
+          <h1 className="text-3xl font-bold">Todos App</h1>
+          {children}
+        </div>
       </body>
     </html>
   );

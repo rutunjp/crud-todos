@@ -1,38 +1,70 @@
 "use client";
 import TaskDialog from "@/components/taskDialog";
 import { useState, useEffect } from "react";
-import { deleteTask, useFetchTasks } from "./utils";
+import { addTask, deleteTask, useFetchTasks } from "./utils";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Home() {
+  const { tasks, setTasks, loading, setLoading } = useFetchTasks();
+  const [todos, setTodos] = useState([]);
+
+  useEffect(() => {
+    if (tasks) {
+      setTodos(tasks);
+    }
+  }, [tasks]);
+
   async function handleDelete(id) {
     const data = await deleteTask(id);
     console.log("DELETEdata", data);
-  }
-  const { tasks, loading } = useFetchTasks();
+    setLoading(true);
 
+    const tempTasks = tasks.filter((task) => task._id !== id);
+    console.log("tasks", tempTasks);
+    setTasks(tempTasks);
+    setLoading(false);
+  }
+
+  const handleTaskAdded = async () => {
+    // Fetch tasks again to update the task list after adding a new task
+    setLoading(true);
+    try {
+      const { tasks: updatedTasks } = await fetch("/api/tasks");
+      console.log("LLDL:", tasks);
+      setTasks(tasks);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
     <>
-      <TaskDialog onTaskChange={useFetchTasks} />
+      <TaskDialog onTaskAdded={handleTaskAdded} />
       <ul>
-        {tasks.map((task) => (
-          <li key={task._id}>
-            <TaskDialog task={task.task} id={task._id} />
-            <Button
-              size="2"
-              variant="destructive"
-              onClick={() => {
-                handleDelete(task._id);
-              }}
-            >
-              Delete
-            </Button>
-          </li>
-        ))}
+        {tasks &&
+          tasks.map((task) => (
+            <li key={task._id}>
+              <TaskDialog
+                task={task.task}
+                id={task._id}
+                priority={task.priority}
+              />
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleDelete(task._id);
+                }}
+              >
+                Mark as done
+              </Button>
+            </li>
+          ))}
       </ul>
     </>
   );

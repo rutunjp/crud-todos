@@ -15,34 +15,36 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { addTask, updateTask } from "@/app/utils";
 
-export default function TaskDialog({ task, priority, id, onTaskChange }) {
+export default function TaskDialog({ task, priority, id, onTaskAdded }) {
   const [localTask, setLocalTask] = useState(task || "");
   const [localPriority, setLocalPriority] = useState(priority || "low");
 
   const handleSave = async () => {
     const newTask = { task: localTask, priority: localPriority };
+
     if (id) {
       await updateTask(id, newTask);
+      setLocalTask(newTask.task);
     } else {
-      console.log(newTask);
-      console.log("add task called");
       await addTask(newTask);
-    } 
+      onTaskAdded();
+    }
   };
-
   useEffect(() => {
     setLocalTask(task || "");
-    setLocalPriority(priority || "low");
+    setLocalPriority(priority); // Setting default value for priority if not provided
   }, [task, priority]);
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">{task || "New task"}</Button>
+        <Button className="w-24" variant="link">
+          {task || "New task"}
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{id || "New Task"}</DialogTitle>
+          <DialogTitle>{task || "New Task"}</DialogTitle>
           <DialogDescription>Make changes to task.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -64,7 +66,7 @@ export default function TaskDialog({ task, priority, id, onTaskChange }) {
               Priority
             </Label>
             <RadioGroup
-              defaultValue={localPriority}
+              defaultValue={localPriority || "low"} // Set the default value for the radio group
               onValueChange={(value) => {
                 console.log("value", value);
                 setLocalPriority(value);

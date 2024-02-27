@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+
 export const useFetchTasks = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [localTasks, setLocalTasks] = useState([]);
+
   useEffect(() => {
-    fetch("/api/tasks", {
-      method: "GET",
-    })
+    fetch("/api/tasks")
       .then((response) => response.json())
       .then((data) => {
         setTasks(data);
@@ -14,9 +15,12 @@ export const useFetchTasks = () => {
       .catch((error) => console.error("Error:", error));
   }, []);
 
-  return { tasks, loading };
-};
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
 
+  return { tasks: localTasks, loading, setLoading, setTasks };
+};
 export const updateTask = async (id, updatedTask) => {
   try {
     console.log("updateTask:", id, updatedTask);
