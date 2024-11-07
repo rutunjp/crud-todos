@@ -47,7 +47,7 @@ export default function Home() {
     <>
       <TaskDialog onTaskAdded={handleTaskAdded} />
       <ul>
-        {tasks &&
+        {/* {tasks &&
           tasks.map((task) => (
             <li key={task._id}>
               <TaskDialog
@@ -64,7 +64,35 @@ export default function Home() {
                 Mark as done
               </Button>
             </li>
-          ))}
+          ))} */}
+
+        {tasks &&
+          tasks.map((task) => {
+            const priority = task.priority || "low"; // Default to "low" if no priority is provided
+            const bgColor =
+              priority === "high"
+                ? "bg-red-500 hover:bg-red-600"
+                : priority === "medium"
+                ? "bg-yellow-500 hover:bg-yellow-600"
+                : "bg-green-500 hover:bg-green-600"; // Low priority (default)
+
+            return (
+              <li key={task._id}>
+                <TaskDialog
+                  task={task.task}
+                  id={task._id}
+                  priority={priority}
+                />
+                <Button
+                  variant="outline"
+                  className={`${bgColor} text-white`}
+                  onClick={() => handleDelete(task._id)}
+                >
+                  Mark as done
+                </Button>
+              </li>
+            );
+          })}
       </ul>
     </>
   );

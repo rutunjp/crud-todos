@@ -68,7 +68,6 @@ export default function TaskDialog({ task, priority, id, onTaskAdded }) {
             <RadioGroup
               defaultValue={localPriority || "low"} // Set the default value for the radio group
               onValueChange={(value) => {
-                console.log("value", value);
                 setLocalPriority(value);
               }}
             >
